@@ -1,5 +1,6 @@
 # Best-First Search Pathfinding
 
+[Demo](https://www.youtube.com/watch?v=RE1eep3BBhY)
 
 Calculates a path once per grid arrangement for all entities to follow towards a goal. Uses best-first search to do a single-pass over the grid and mark each cell with the 'next' option an entity should take, routing to the goal.
 
