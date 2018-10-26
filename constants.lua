@@ -3,14 +3,14 @@ return {
         CELL = {
             EMPTY = {0,0,0},
             OBSTACLE = {1,1,1},
-            GOAL = {0,1,0},
-            SPAWN = {0,0,1}
+            GOAL = {160/255,32/255,240/255},
+            SPAWN = {0,1,1}
         },
         ENTITY = {
-            DEFAULT = {1,0.8,0}
         }
     },
-    ENTITY_SIZE = 8,
+    ENTITY_SIZE = 6,
+    ENTITY_SPEED = 12,
     OBSTACLE_SPAWN_RATE = 0.2,
     SPAWN_TIMER = 0.2
 }

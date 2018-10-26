@@ -20,15 +20,30 @@ World = Class {
         self.goal = self.grid[cols-1][rows-1]
         self.goal:setGoal()
         self:calculatePaths()
+        self.colours = {
+            {1,42/255,0},
+            {1,128/255,0},
+            {1,1,0},
+            {170/255, 255, 0},
+            {43/255, 1, 0},
+            {0, 1, 1},
+            {0, 128/255, 1},
+            {0, 42/255, 1},
+            {128/255, 0, 1},
+            {1, 0, 1},
+            {1, 0, 43/255}
+        }
+        self.colourIndex = 1
+        self.dragQueue = {}
+        self.dragCount = 0
     end;
     draw = function(self)
         for i = 0, self.cols, 1 do
             for j = 0, self.rows, 1 do
-                self.grid[i][j]:draw(self.cellWidth, self.cellHeight)
+                self.grid[i][j]:draw()
             end
         end
 
-        love.graphics.setColor(constants.COLOURS.ENTITY.DEFAULT)
         for i, entity in pairs(self.entities) do
             entity:draw()
         end;
@@ -38,15 +53,40 @@ World = Class {
             local gridX, gridY = self:calculateWorldCoordinates(entity.x, entity.y)
             assert(self.grid[gridX] and self.grid[gridX][gridY])
             if not self.grid[gridX][gridY].goal then 
-                entity:update(dt, self.grid[gridX][gridY], self.cellWidth, self.cellHeight)
+                local destroy = entity:update(dt, self.grid[gridX][gridY], self.cellWidth, self.cellHeight)
+                if destroy then
+                    table.remove(self.entities, i)
+                end
             else
                 table.remove(self.entities, i)
             end
         end;
 
+        for i = 0, self.cols, 1 do
+            for j = 0, self.rows, 1 do
+                self.grid[i][j]:update(dt)
+            end
+        end
+
         if love.keyboard.isDown('space') then
             self:spawn(dt)
         end
+        
+        --TODO: WIP drag select
+        -- if love.mouse.isDown(1) then
+        --     local gridX, gridY = self:calculateWorldCoordinates(love.mouse.getPosition())
+        --     if not self.dragQueue[{gridX, gridY}] then
+        --         self.dragQueue[{gridX, gridY}] = 1
+        --     end
+            
+        --     print(#self.dragQueue)
+        -- elseif #self.dragQueue > 0 then
+        --     for i, cell in pairs(self.dragQueue) do
+        --         print("huh")
+        --         print(cell[1], cell[2])
+        --     end
+        --     self.dragQueue = {}
+        -- end
     end;
     getNeighbours = function(self, target)
         assert(target.x and target.y)
@@ -111,7 +151,7 @@ World = Class {
         -- find the tile the coordinates are in. then place the entity at the centre.
         local gridX, gridY = self:calculateWorldCoordinates(screenX, screenY)
         if not self.grid[gridX][gridY].obstacle then
-            self.entities[#self.entities+1] = Entity(gridX*self.cellWidth + self.cellWidth/2, gridY*self.cellHeight + self.cellHeight/2)
+            self.entities[#self.entities+1] = self:createEntity(gridX*self.cellWidth + self.cellWidth/2, gridY*self.cellHeight + self.cellHeight/2)
         end
     end;
     setGoal = function(self, x, y)
@@ -124,15 +164,24 @@ World = Class {
         local newSpawn = self.grid[x][y]
         newSpawn:setSpawn()
         self.spawns[#self.spawns+1] = newSpawn
+        self:calculatePaths()
     end;
     spawn = function(self, dt)
         if self.spawnTimer <= 0  then
             -- spawn something
             for i, spawn in pairs(self.spawns) do
-                self.entities[#self.entities+1] = Entity(spawn.x*self.cellWidth + self.cellWidth/2, spawn.y*self.cellHeight+ self.cellHeight/2)
+                self:createEntity(spawn.x*self.cellWidth + self.cellWidth/2, spawn.y*self.cellHeight+ self.cellHeight/2)
             end;
             self.spawnTimer = constants.SPAWN_TIMER
         end
         self.spawnTimer = self.spawnTimer - dt
+    end;
+    createEntity = function(self, x, y)
+        local colour = self.colours[self.colourIndex]
+        self.colourIndex = self.colourIndex + 1
+        if self.colourIndex > #self.colours then
+            self.colourIndex = 1
+        end
+        self.entities[#self.entities+1] = Entity(x, y, colour)
     end;
 }

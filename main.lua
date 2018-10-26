@@ -8,8 +8,7 @@ function love.load()
     constants = require ("constants")
     require ("class.world")
 
-    -- local fileData = require("grids/example-1")
-    world = World(16, 16)
+    world = World(32, 32)
 end
 
 function love.update(dt)
@@ -17,20 +16,20 @@ function love.update(dt)
 end
 
 function love.draw()
-    world:draw()
+    world:draw(frame)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
     if button == 2 then 
         if love.keyboard.isDown('lshift') then
-            world:setGoal(world:calculateWorldCoordinates(x, y))
+            world:addSpawn(world:calculateWorldCoordinates(x, y))
         else
             world:createEntityAt(x, y)
         end
         
     elseif button == 1 then
         if love.keyboard.isDown('lshift') then
-            world:addSpawn(world:calculateWorldCoordinates(x, y))
+            world:setGoal(world:calculateWorldCoordinates(x, y))
         else 
             world:toggleObstacle(world:calculateWorldCoordinates(x, y))
         end

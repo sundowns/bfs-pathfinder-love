@@ -9,20 +9,39 @@ Cell = Class {
         self.height = height
         self.cameFrom = nil
         self.distance = 0
+        self.opacity = 1
+        self.opacityDirection = 1
+    end;
+    update = function(self, dt)
+        self.opacity = self.opacity + self.opacityDirection * dt
+        if self.opacity > 1 or self.opacity < 0.1 then
+            self.opacityDirection = self.opacityDirection * -1
+        end
     end;
     draw = function(self)
         if self.obstacle then
             love.graphics.setColor(constants.COLOURS.CELL.OBSTACLE)
+            love.graphics.rectangle('fill', self.x*self.width, self.y*self.height, self.width, self.height)
+            love.graphics.setColor(1,1,1,0.2)
+            love.graphics.rectangle('line', self.x*self.width, self.y*self.height, self.width, self.height)
         elseif self.goal then
+            love.graphics.setColor(1,1,1)
+            love.graphics.circle('fill', self.x*self.width + self.width/2, self.y*self.height + self.width/2, self.width/2)
             love.graphics.setColor(constants.COLOURS.CELL.GOAL)
+            love.graphics.circle('fill', self.x*self.width + self.width/2, self.y*self.height + self.width/2, self.width/2*0.8)
         elseif self.spawn then
+            love.graphics.setColor(1,1,1)
+            love.graphics.circle('fill', self.x*self.width + self.width/2, self.y*self.height + self.width/2, self.width/2)
             love.graphics.setColor(constants.COLOURS.CELL.SPAWN)
+            love.graphics.circle('fill', self.x*self.width + self.width/2, self.y*self.height + self.width/2, self.width/2*0.8)
         else
             love.graphics.setColor(constants.COLOURS.CELL.EMPTY)
+            love.graphics.rectangle('fill', self.x*self.width, self.y*self.height, self.width, self.height)
+            love.graphics.setColor(1,1,1,0.2)
+            love.graphics.rectangle('line', self.x*self.width, self.y*self.height, self.width, self.height)
         end
-        love.graphics.rectangle('fill', self.x*self.width, self.y*self.height, self.width, self.height)
-        love.graphics.setColor(1,1,1,0.2)
-        love.graphics.rectangle('line', self.x*self.width, self.y*self.height, self.width, self.height)
+        
+        
         if debug then
             Util.l.resetColour()
             love.graphics.print(self.distance, self.x*self.width, self.y*self.height)
