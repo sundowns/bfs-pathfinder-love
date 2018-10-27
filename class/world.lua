@@ -17,7 +17,7 @@ World = Class {
         self.spawnTimer = constants.SPAWN_TIMER
 
         self.spawns = {}
-        self.goal = self.grid[cols-1][rows-1]
+        self.goal = self.grid[love.math.random(cols-1)][love.math.random(rows-1)]
         self.goal:setGoal()
         self:calculatePaths()
         self.colours = {
@@ -151,7 +151,7 @@ World = Class {
         -- find the tile the coordinates are in. then place the entity at the centre.
         local gridX, gridY = self:calculateWorldCoordinates(screenX, screenY)
         if not self.grid[gridX][gridY].obstacle then
-            self.entities[#self.entities+1] = self:createEntity(gridX*self.cellWidth + self.cellWidth/2, gridY*self.cellHeight + self.cellHeight/2)
+            self:createEntity(gridX*self.cellWidth + self.cellWidth/2, gridY*self.cellHeight + self.cellHeight/2)
         end
     end;
     setGoal = function(self, x, y)
